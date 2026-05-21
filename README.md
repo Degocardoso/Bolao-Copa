@@ -27,9 +27,22 @@ Crie (se ainda não tiver) uma conta em:
    região mais perto (ex: *South America (São Paulo)*). Clique em **Create**.
 3. Espere ~2 min até o projeto ficar pronto.
 4. No menu lateral, abra **SQL Editor** → **New query**.
-5. Abra o arquivo `supabase/schema.sql` deste projeto, copie **tudo**, cole no editor
-   e clique em **Run** (canto inferior direito). Deve aparecer "Success".
-   ✔️ Isso cria todas as tabelas, o ranking e as regras de segurança.
+5. Abra o arquivo `supabase/schema.sql` deste projeto. **Antes de colar**, ache a
+   linha com `'seu-email@gmail.com'` (perto da tabela `admins`) e troque pelo
+   **seu email do Google** — o mesmo que você vai usar para entrar. Assim você já
+   nasce aprovado e com poderes de admin.
+6. Copie **tudo**, cole no editor e clique em **Run**. Deve aparecer "Success".
+   ✔️ Isso cria todas as tabelas, o ranking, a importação de jogos, o controle de
+   membros e as regras de segurança — tudo de uma vez.
+
+> Não achou a linha do email ou esqueceu de trocar? Sem problema: o site também
+> te reconhece como admin pela variável `NEXT_PUBLIC_ADMIN_EMAILS` (passo 5) e te
+> aprova sozinho no primeiro acesso.
+
+> **Já tinha logado antes (nos testes) e ficou como "pendente"?** Rode o arquivo
+> `supabase/aprovar-admin.sql` (troque o email nele primeiro). Ele só te aprova,
+> sem apagar nenhum dado. Ou simplesmente entre no site com seu email de admin —
+> a aprovação automática resolve.
 
 ---
 
@@ -99,9 +112,14 @@ público nem mande por mensagem. Ela só vai no painel da Vercel (passo 5).
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | a chave `anon public` |
    | `SUPABASE_SERVICE_ROLE_KEY` | a chave `service_role secret` |
    | `NEXT_PUBLIC_ADMIN_EMAILS` | **seu** email do Google (você será o admin) |
+   | `FOOTBALL_DATA_TOKEN` | token grátis da Football-Data (resultados automáticos) |
 
    > Pode pôr mais de um admin separando por vírgula:
    > `voce@gmail.com,outro@gmail.com`
+   >
+   > O `FOOTBALL_DATA_TOKEN` é opcional: sem ele, você lança os placares na mão
+   > pelo painel. Para tê-lo, crie conta grátis em
+   > https://www.football-data.org/client/register e copie seu token.
 
 4. Clique em **Deploy** e espere ~1 min. A Vercel te dá um endereço tipo
    `https://bolao-copa.vercel.app`. Esse é o link do seu site! 🎉
@@ -116,12 +134,25 @@ Isso garante que o login do Google volte para o seu site certo.
 
 ## 🎮 Como usar
 
-- **Você (admin):** entre no site, vá na aba **Admin**. Cadastre os times (com emoji
-  da bandeira e grupo), depois os jogos (com data e hora de início). Conforme os
-  jogos acontecem, lance o placar oficial — o ranking se atualiza sozinho.
-- **A galera:** manda o link pra todo mundo. Cada um entra com o Google, vai em
-  **Jogos**, define o placar de cada partida e salva. Pode editar até o jogo começar.
-  Depois disso, trava. Acompanham tudo em **Ranking** e **Meus Palpites**.
+- **Você (admin):** entre no site, vá na aba **Admin**. Lá você tem:
+  - **Importação automática:** já vem com a fonte gratuita da Copa 2026 (projeto
+    openfootball). Clique em **"Importar jogos da Copa"** e o sistema cria os times
+    e todos os jogos com data e horário, sem digitar nada. Jogos repetidos não
+    duplicam e os palpites são preservados. Depois do sorteio oficial, clique de
+    novo para trazer os confrontos reais.
+  - **Membros:** quando alguém entra com o Google, aparece aqui como *aguardando
+    aprovação*. Clique em **Aprovar** para liberar (ou **Bloquear** quem você não
+    conhece). Só aprovados conseguem palpitar — então mesmo que o link vaze, ninguém
+    de fora entra no bolão. Você já entra aprovado automaticamente.
+  - **Jogos & placares:** os resultados chegam **sozinhos** da API (se você
+    configurou o `FOOTBALL_DATA_TOKEN`), com o ranking se atualizando sem você fazer
+    nada. Se preferir, ou se algum jogo não vier, dá para lançar o placar na mão aqui.
+- **A galera:** manda o link pra todo mundo. Cada um entra com o Google e aguarda
+  você aprovar. Depois, vai em **Jogos**, define o placar de cada partida e salva
+  (pode editar até o jogo começar — depois trava). Acompanham tudo em **Ranking**,
+  em **Meus Palpites**, e na aba **Galera** (transparência): clicam num nome e veem
+  os palpites da pessoa, com a data/hora de cada um. Palpites de jogos que ainda não
+  começaram ficam ocultos (🔒) até o apito, para ninguém copiar.
 
 ---
 

@@ -3,6 +3,7 @@ export type Time = {
   nome: string;
   bandeira: string | null;
   grupo: string | null;
+  chave_externa?: string | null;
 };
 
 export type Jogo = {
@@ -14,6 +15,7 @@ export type Jogo = {
   inicio: string;
   gols_casa: number | null;
   gols_fora: number | null;
+  chave_externa?: string | null;
 };
 
 export type Palpite = {

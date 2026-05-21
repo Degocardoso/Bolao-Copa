@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation';
 import { criarClienteServidor } from '@/lib/supabase-server';
-import { ehAdmin } from '@/lib/supabase-admin';
+import { ehAdmin, criarClienteAdmin } from '@/lib/supabase-admin';
 import type { Jogo, Time } from '@/lib/tipos';
 import { formatarData } from '@/lib/tipos';
 import { criarTime, apagarTime, criarJogo, apagarJogo, lancarPlacar, limparPlacar } from './acoes';
+import BotaoImportar from './BotaoImportar';
+import GestaoMembros from './GestaoMembros';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,14 +14,25 @@ export default async function PaginaAdmin() {
   const { data } = await supabase.auth.getUser();
   if (!ehAdmin(data?.user?.email)) redirect('/jogos');
 
-  const [{ data: times }, { data: jogos }] = await Promise.all([
+  const [{ data: times }, { data: jogos }, { data: imp }] = await Promise.all([
     supabase.from('times').select('*').order('grupo').order('nome'),
     supabase.from('jogos').select('*').order('inicio'),
+    supabase.from('importacoes').select('*').order('quando', { ascending: false }).limit(1),
   ]);
+  const ultimaImp = (imp && imp[0]) || null;
   const listaTimes = (times as Time[]) || [];
   const listaJogos = (jogos as Jogo[]) || [];
   const mapaTimes = new Map<number, Time>();
   listaTimes.forEach((t) => mapaTimes.set(t.id, t));
+
+  // Membros (todos os perfis), via service role para enxergar pendentes
+  const admin = criarClienteAdmin();
+  const { data: membros } = await admin
+    .from('perfis')
+    .select('id, nome, email, status, criado_em')
+    .order('criado_em', { ascending: true });
+  const listaMembros = membros || [];
+  const qtdPendentes = listaMembros.filter((m) => m.status === 'pendente').length;
 
   return (
     <main className="container" style={{ paddingTop: 22 }}>
@@ -27,6 +40,17 @@ export default async function PaginaAdmin() {
       <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 22 }}>
         Cadastre times, jogos e lance os placares oficiais.
       </p>
+
+      {/* IMPORTAÇÃO AUTOMÁTICA */}
+      <BotaoImportar ultima={ultimaImp} />
+
+      {/* MEMBROS */}
+      <section className="bloco">
+        <h3 className="bloco-tit">
+          👥 Membros{qtdPendentes > 0 ? ` · ${qtdPendentes} aguardando` : ''}
+        </h3>
+        <GestaoMembros membros={listaMembros} />
+      </section>
 
       {/* CADASTRAR TIME */}
       <section className="bloco">
@@ -136,6 +160,10 @@ export default async function PaginaAdmin() {
         .bloco {
           background: var(--panel); border: 1px solid var(--line);
           border-radius: 16px; padding: 18px; margin-bottom: 16px;
+        }
+        .bloco-destaque {
+          border-color: var(--gold-deep);
+          background: linear-gradient(180deg, rgba(244,196,48,0.06), var(--panel));
         }
         .bloco-tit { font-size: 15px; margin-bottom: 14px; }
         .inp {

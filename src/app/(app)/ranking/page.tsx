@@ -1,5 +1,6 @@
 import { criarClienteServidor } from '@/lib/supabase-server';
 import type { LinhaRanking } from '@/lib/tipos';
+import DispararSync from '@/components/DispararSync';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,7 @@ export default async function PaginaRanking() {
 
   return (
     <main className="container" style={{ paddingTop: 22 }}>
+      <DispararSync />
       <h2 className="display" style={{ fontSize: 26, marginBottom: 4 }}>Ranking</h2>
       <p style={{ color: 'var(--text-dim)', fontSize: 14, marginBottom: 20 }}>
         3 pontos por placar cravado. Quem manda no bolão? 🏆
