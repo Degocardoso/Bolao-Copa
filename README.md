@@ -167,4 +167,4 @@ Isso garante que o login do Google volte para o seu site certo.
 - **"Mudei uma variável na Vercel."** Depois de alterar variáveis, clique em
   **Redeploy** no painel da Vercel para valer.
 
-Bom bolão! ⚽🏆
+Bom bolão! ⚽🏆...
